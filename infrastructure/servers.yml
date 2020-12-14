@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: >
+  This template is used to deploy the bastion hosts on the public subnets
+
+Parameters:
+  EnvironmentName:
+    Description: An environment name that will be prefixed to resource names.
+    Type: String
+    Default: 'landscaping'
+
+Resources:
+  #**************** Security Group *****************
+  LoadBalancerSecGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http traffic to our load balancer
+      VpcId:
+        Fn::ImportValue: !Sub '${EnvironmentName}-vpc'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-lb-sg
+
+  WebServerSecGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http to our hosts and SSH from local only
+      VpcId:
+        Fn::ImportValue: !Sub ${EnvironmentName}-vpc
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp:
+            Fn::ImportValue: !Sub ${WebAppEnv}-BASTION0-CIDR
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp:
+            Fn::ImportValue: !Sub ${WebAppEnv}-BASTION0-CIDR
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Web Servers Security Group
+
+  #**************** Launch Configuration *****************
+  # WebAppLaunchConfig:
+  #   Type: AWS::AutoScaling::LaunchConfiguration
+  #   Properties:
+  #     UserData:
+  #       Fn::Base64: !Sub |
+  #         #!/bin/bash
+  #         # Install Apache 2
+  #         apt-get update -y
+  #         apt-get install unzip awscli -y
+  #         apt-get install apache2 -y
+  #         systemctl start apache2.service
+  #         cd /var/www/html
+  #         echo "hello world" > index.html
+  #         systemctl restart apache2.service
+  #     SecurityGroups:
+  #       - Ref: WebServerSecGroup
+  #     InstanceType: t2.micro
+  #     ImageId: ami-0a91cd140a1fc148a
+  #     IamInstanceProfile: !Ref RootInstanceProfile
+  #     BlockDeviceMappings:
+  #       - DeviceName: '/dev/sdk'
+  #         Ebs:
+  #           VolumeSize: 10
