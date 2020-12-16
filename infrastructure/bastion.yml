@@ -95,24 +95,24 @@ Resources:
           Value: !Sub ${EnvironmentName}-bastion-2b
 
   #**************** Bostion hosts IP ******************************
-  # SECTION: Elastic IP for Public Subnet 2A
+  # SECTION: Elastic IP for bastion host in Public Subnet 2A
   ElasticIPAddress2AEIP:
     Type: AWS::EC2::EIP
-    DependsOn: InternetGatewayAttachment
     Properties:
       Domain: VPC
+      InstanceId: !Ref BastionHost2A
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName}-eip-sub-2a
+          Value: !Sub ${EnvironmentName}-eip-bastion-2a
 
-  # SECTION: Elastic IP for Public Subnet 2B
+  # SECTION: Elastic IP for bastion host in Public Subnet 2B
   ElasticIPAddress2BEIP:
     Type: AWS::EC2::EIP
-    DependsOn: InternetGatewayAttachment
     Properties:
       Domain: VPC
+      InstanceId: !Ref BastionHost2B
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName}-eip-sub-2b
+          Value: !Sub ${EnvironmentName}-eip-bastion-2b
 
   #**************** Outputs ******************************
