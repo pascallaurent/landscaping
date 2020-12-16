@@ -226,6 +226,18 @@ Outputs:
     Export:
       Name: !Sub ${EnvironmentName}-vpc
 
+  PublicSubnet2ACIDR:
+    Description: Public subnet 2A CIDR
+    Value: !Ref PublicSubnet2ACIDR
+    Export:
+      Name: !Sub ${EnvironmentName}-pub-sub2a-cidr
+
+  PublicSubnet2BCIDR:
+    Description: Public subnet 2B CIDR
+    Value: !Ref PublicSubnet2BCIDR
+    Export:
+      Name: !Sub ${EnvironmentName}-pub-sub2b-cidr
+
   PublicSubnet2A:
     Description: Public Subnet 2A
     Value: !Ref PublicSubnet2A
